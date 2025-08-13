@@ -3,3 +3,6 @@ new-env-name/
 .DS_Store
 
 js_footage/
+
+__pycache__/
+*.pyc
