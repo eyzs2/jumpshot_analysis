@@ -9,6 +9,24 @@ mp_pose = mp.solutions.pose                 # Pose detection module
 mp_drawing = mp.solutions.drawing_utils     # Drawing utilities
 mp_drawing_styles = mp.solutions.drawing_styles  # Default styles for drawing landmarks
 
+# Helper function for angle calculation
+
+def calculate_angle(landmarks):
+    # Takes in a tuple of three coordinate objects, returns angle 
+    # Numpy 2D array? cross product???
+    # middle is apex of triangle
+    xycoords = [np.array([landmark.x,landmark.y]) for landmark in landmarks]
+    xyzcoords = [np.array([landmark.x,landmark.y,landmark.z]) for landmark in landmarks]
+
+    # Computes the vectors from the coords, stores it in a list
+    xyvectors = [(xycoords[0]-xycoords[1]),(xycoords[2]-xycoords[1])]
+    xyzvectors = [(xyzcoords[0]-xyzcoords[1]),(xyzcoords[2]-xyzcoords[1])]
+    
+    xyangle = np.arccos(np.dot(xyvectors[0],xyvectors[1])/(np.linalg.norm(xyvectors[0])*np.linalg.norm(xyvectors[1])))
+    xyzangle = np.arccos(np.dot(xyzvectors[0],xyzvectors[1])/(np.linalg.norm(xyzvectors[0])*np.linalg.norm(xyzvectors[1])))
+    return (xyangle, xyzangle)
+
+
 # Helper function for video annotation
 
 def draw_landmarks_with_hidden_face(rgb_image, detection_result):
