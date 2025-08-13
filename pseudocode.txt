@@ -1,0 +1,12 @@
+factors affecting jumpshot:
+- knee angle, hip angle, elbow angle
+    - load point, set point
+    - ball doesn't move too far backwards at set point
+- joint extension (full extension)
+- arm/leg synchronisation (one motion/two motion)
+    - tracking this: relative position to each other (magnitude between vector points)
+- hip/knee synchronisation
+
+
+- track shooting side (right markers)
+    - velocity? acceleration?
