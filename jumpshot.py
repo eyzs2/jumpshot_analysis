@@ -24,7 +24,7 @@ def calculate_angle(landmarks):
     
     xyangle = np.arccos(np.dot(xyvectors[0],xyvectors[1])/(np.linalg.norm(xyvectors[0])*np.linalg.norm(xyvectors[1])))
     xyzangle = np.arccos(np.dot(xyzvectors[0],xyzvectors[1])/(np.linalg.norm(xyzvectors[0])*np.linalg.norm(xyzvectors[1])))
-    return (xyangle, xyzangle)
+    return np.array([xyangle, xyzangle])
 
 
 # Helper function for video annotation
