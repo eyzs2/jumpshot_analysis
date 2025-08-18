@@ -15,15 +15,13 @@ detector = vision.PoseLandmarker.create_from_options(options)
 
 
 # Load the input image.
-image = mp.Image.create_from_file("js_footage/test.jpg")
+image = mp.Image.create_from_file("js_footage/js.jpg")
 
 # Convert to OpenCV image
 np_img = image.numpy_view()  # RGBA
 
 bgr_img = cv2.cvtColor(np_img, cv2.COLOR_RGBA2BGR)
 rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
-
-print(np_img.shape, np_img.dtype)
 
 # Detect pose landmarks from the input image.
 detection_result = detector.detect(image)
@@ -39,12 +37,11 @@ cv2.waitKey(0)  # Wait for key press
 cv2.destroyAllWindows()
 
 left_arm_idx = (11,13,15)
+right_arm_idx = (12,14,16)
 left_arm_coords = []
 
-for idx in left_arm_idx:
-    left_arm_coords.append(pose_landmarks[idx])
-    print(idx, pose_landmarks[idx])
+right_arm_coords = [pose_landmarks[idx] for idx in right_arm_idx]
 
-angle = calculate_angle(left_arm_coords)
+angle = calculate_angle(right_arm_coords)
 deg_angle = np.rad2deg(angle)
-print(angle, deg_angle)
+print(f"Angle in radians: {angle}, angle in degrees: {deg_angle}")

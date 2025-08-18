@@ -3,10 +3,20 @@ factors affecting jumpshot:
     - load point, set point
     - ball doesn't move too far backwards at set point
 - joint extension (full extension)
-- arm/leg synchronisation (one motion/two motion)
-    - tracking this: relative position to each other (magnitude between vector points)
-- hip/knee synchronisation
+- synchronisation
+    - arm/leg synchronisation (one motion/two motion)
+        - tracking this: relative position to each other (magnitude between vector points)
+    - hip/knee synchronisation
+    - plot angular velocity of knee, hips, elbow matplotlib
 
 
 - track shooting side (right markers)
-    - velocity? acceleration?
+
+- joint triplets to take note
+    - shoulder elbow wrist (elbow angle) (SEW)
+    - hip knee ankle (knee angle) (HKA)
+    - knee hip shoulder (hip angle) (KHS)
+    - hip shoulder elbow (armpit angle) (HSE)
+
+        - armpit angle should not be increasing after full extension of lower body (HKA, KHS, HSE)
+        - one-motion/two-motion detection (armpit angle zero angular velocity)
