@@ -19,4 +19,7 @@ factors affecting jumpshot:
     - hip shoulder elbow (armpit angle) (HSE)
 
         - armpit angle should not be increasing after full extension of lower body (HKA, KHS, HSE)
-        - one-motion/two-motion detection (armpit angle zero angular velocity)
+        - one-motion/two-motion detection (armpit angle zero angular velocity, jump then release or jump + release)
+
+        - if value is more than x SDs, ignore value and take average of values before and after
+            - deviation from the path? regression

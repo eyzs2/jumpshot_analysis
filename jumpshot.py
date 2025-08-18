@@ -2,6 +2,7 @@ import mediapipe as mp
 import numpy as np
 import cv2
 import matplotlib
+import matplotlib.pyplot as plt
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe.python.solutions.drawing_utils import DrawingSpec
@@ -10,10 +11,10 @@ mp_pose = mp.solutions.pose                 # Pose detection module
 mp_drawing = mp.solutions.drawing_utils     # Drawing utilities
 mp_drawing_styles = mp.solutions.drawing_styles  # Default styles for drawing landmarks
 
-right_elbow_idx = [12,14,16]
-right_armpit_idx = [24,12,14]
-right_hip_idx = [26,24,12]
-right_knee_idx = [28,26,24]
+right_side = {"elbow": [12,14,16], "armpit": [24,12,14], "hip": [26,24,12], "knee": [28,26,24]}
+left_side = {k: [v - 1 for v in vals] for k, vals in right_side.items()}
+
+side = None
 
 
 # Helper function for angle calculation
@@ -90,7 +91,9 @@ def draw_landmarks_with_hidden_face(rgb_image, detection_result):
     return annotated_image
 
 def angvel_calculation(angles):
-    
+    # Numerical differentiation
+    # ang_vel = (angle[frame_index - 2] - 4*angle[frame_index - 1] + 3*angle[frame_index])*fps
+    # angle calculation using vectors from pose_landmarks[]
     velocity = 1
     return velocity
 
@@ -101,7 +104,7 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 
 # Replace with path of video to be analysed
 
-videoPath = "js_footage/klay_js2.mov"
+videoPath = "js_footage/klay_js3.mov"
 
 cap = cv2.VideoCapture(videoPath)
 
@@ -121,12 +124,12 @@ if not fps:
 
 options = PoseLandmarkerOptions(
     base_options=BaseOptions(model_asset_path="models/pose_landmarker_full.task"),
-    running_mode=VisionRunningMode.VIDEO)
+    running_mode=VisionRunningMode.VIDEO, min_tracking_confidence=0.7, min_pose_detection_confidence=0.7)
 
 # Output video
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 # Replace path with desired video name
-output_video_path = "js_footage/klay_js2_annotated.mov"
+output_video_path = "js_footage/klay_shot_annotated3.mov"
 out = cv2.VideoWriter(output_video_path, fourcc, int(fps/2), (video_width, video_height))
 
 with PoseLandmarker.create_from_options(options) as landmarker:
@@ -142,8 +145,18 @@ with PoseLandmarker.create_from_options(options) as landmarker:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
         result = landmarker.detect_for_video(mp_image, frame_index * int(1000/fps))
 
+
         # Draw landmarks on RGB frame
         if result.pose_landmarks:
+            pose_landmarks = result.pose_landmarks[0]
+            if side == None:
+                if pose_landmarks[12].z < pose_landmarks[11].z:
+                    side = right_side
+                else:
+                    side = left_side
+                coords = {key:[] for key in {v for sublist in side.values() for v in sublist}}
+            for key in coords.keys():
+                coords[key].append(pose_landmarks[key])
             annotated_rgb = draw_landmarks_with_hidden_face(rgb_frame, result)
         else:
             annotated_rgb = rgb_frame
@@ -156,7 +169,16 @@ with PoseLandmarker.create_from_options(options) as landmarker:
 
         frame_index += 1
 
+# print(frame_index, fps)
 # Cleanup
 cap.release()
 out.release()
 print(f"Annotated video saved to {output_video_path}")
+
+time_values = np.linspace(0, round((frame_index/fps), 3), num=frame_index)
+for idx in side["elbow"]:
+    plt.plot(time_values, [value.x for value in coords[idx]])
+plt.xlabel('$x$')
+plt.ylabel('$f$')
+plt.title("Simple plot of $x$ vs $f$")
+plt.show()

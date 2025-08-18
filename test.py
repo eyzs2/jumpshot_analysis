@@ -36,12 +36,23 @@ cv2.imshow("Annotated Image", annotated_bgr)
 cv2.waitKey(0)  # Wait for key press
 cv2.destroyAllWindows()
 
-left_arm_idx = (11,13,15)
-right_arm_idx = (12,14,16)
-left_arm_coords = []
+right_side = {"elbow": [12,14,16], "armpit": [24,12,14], "hip": [26,24,12], "knee": [28,26,24]}
+left_side = {k: [v - 1 for v in vals] for k, vals in right_side.items()}
 
-right_arm_coords = [pose_landmarks[idx] for idx in right_arm_idx]
 
-angle = calculate_angle(right_arm_coords)
+# If pose_landmarks[right_shoulder].z < pose_landmarks[left_shoulder].z
+#   use right_arm_idx
+# else use left
+
+print(f"Right shoulder z: {pose_landmarks[12].z}, left shoulder z: {pose_landmarks[11].z}")
+
+if pose_landmarks[12].z < pose_landmarks[11].z:
+    coords = [pose_landmarks[idx] for idx in right_side["elbow"]]
+else:
+    coords = left_side["elbow"]
+    coords = [pose_landmarks[idx] for idx in left_side["elbow"]]
+
+
+angle = calculate_angle(coords)
 deg_angle = np.rad2deg(angle)
 print(f"Angle in radians: {angle}, angle in degrees: {deg_angle}")
