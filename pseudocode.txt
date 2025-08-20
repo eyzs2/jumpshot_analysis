@@ -23,3 +23,7 @@ factors affecting jumpshot:
 
         - if value is more than x SDs, ignore value and take average of values before and after
             - deviation from the path? regression
+
+
+--> landmark objects --> x/y values --> (calculate angle for joint specified by key:list dict) --> joint key:list of angles dict 
+--> angular velocity from numerical diff

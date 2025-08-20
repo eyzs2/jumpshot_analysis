@@ -36,7 +36,9 @@ def calculate_angle(landmarks):
     
     xyangle = np.arccos(np.dot(xyvectors[0],xyvectors[1])/(np.linalg.norm(xyvectors[0])*np.linalg.norm(xyvectors[1])))
     # xyzangle = np.arccos(np.dot(xyzvectors[0],xyzvectors[1])/(np.linalg.norm(xyzvectors[0])*np.linalg.norm(xyzvectors[1])))
-    return np.array([xyangle])
+
+    deg_angle = round(np.rad2deg(xyangle),3)
+    return np.array([deg_angle])
 
 # Helper function for video annotation
 
@@ -89,6 +91,10 @@ def draw_landmarks_with_hidden_face(rgb_image, detection_result):
       custom_style)
 
     return annotated_image
+
+def draw_angle(frame, joint): # rgb frame, joint is a 
+    # plot_coord = joint[1]
+    return frame
 
 def angvel_calculation(angles):
     # Numerical differentiation
@@ -150,13 +156,20 @@ with PoseLandmarker.create_from_options(options) as landmarker:
         if result.pose_landmarks:
             pose_landmarks = result.pose_landmarks[0]
             if side == None:
+                # If right shoulder (idx = 12) is closer to camera than left shoulder (idx = 11)
                 if pose_landmarks[12].z < pose_landmarks[11].z:
                     side = right_side
                 else:
                     side = left_side
                 coords = {key:[] for key in {v for sublist in side.values() for v in sublist}}
+                angles = {key:[] for key in side.keys()}
             for key in coords.keys():
                 coords[key].append(pose_landmarks[key])
+            for keyy in angles.keys():
+                coord_indices = side[keyy]
+                current_angle = calculate_angle([coords[idx][-1] for idx in coord_indices])
+                angles[keyy].append(current_angle)
+
             annotated_rgb = draw_landmarks_with_hidden_face(rgb_frame, result)
         else:
             annotated_rgb = rgb_frame
@@ -175,10 +188,12 @@ cap.release()
 out.release()
 print(f"Annotated video saved to {output_video_path}")
 
+
+# Plot angle over time
 time_values = np.linspace(0, round((frame_index/fps), 3), num=frame_index)
-for idx in side["elbow"]:
-    plt.plot(time_values, [value.x for value in coords[idx]])
-plt.xlabel('$x$')
-plt.ylabel('$f$')
-plt.title("Simple plot of $x$ vs $f$")
+plt.plot(time_values, angles["elbow"])
+plt.xlabel('$time$')
+plt.ylabel('$angle$')
+plt.title("Simple plot of $time$ vs $elbow angle$")
 plt.show()
+
